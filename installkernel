@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if [ -f $4/vmlinuz-$1 ]; then
+	mv $4/vmlinuz-$1 $4/vmlinuz-${1}.old
+fi
+
+if [ -f $4/System-${1}.map ]; then
+	mv $4/System-${1}.map $4/System-${1}.old
+fi
+
+if [ -f $4/initramfs-${1}.img ]; then
+	mv $4/initramfs-${1}.img $4/initramfs-${1}.old
+fi
+
+cat $2 > $4/vmlinuz-${1}
+cp $3 $4/System-${1}.map
+
+if [ -x /usr/bin/mkinitcpio ]; then
+        /usr/bin/mkinitcpio -g $4/initramfs-${1}.img -k $1
+else
+        sync
+        echo "Cannot find mkinitcpio"
+fi
+
+if [ -x /usr/bin/grub-mkconfig ]; then
+        /usr/bin/grub-mkconfig -o /boot/grub/grub.cfg
+else
+       sync
+       echo "Cannot find grub-mkconfig"
+fi

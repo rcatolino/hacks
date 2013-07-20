@@ -1,0 +1,8 @@
+#!/bin/bash
+lpath=/home/raph/music/phone
+rpath=/mnt/sdcard/Music
+dirlist=$(ls $lpath)
+for dir in $dirlist
+do
+  adb push $lpath/$dir $rpath
+done

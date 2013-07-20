@@ -1,0 +1,18 @@
+#!/bin/bash
+RET=$1
+test -z $RET && RET=-1
+if (( $RET==0 ))
+then
+  HEAD="build succesful"
+  BODY="Your build terminated succesfully on `date`"
+else
+  HEAD="build failed"
+  BODY="Your build failed on `date`"
+fi
+#the log might not be such a good idea for this version...
+BODY+=`cat ./make.log`
+notify-send \
+  "$HEAD" \
+  "$BODY" \
+  -t 3000 \
+

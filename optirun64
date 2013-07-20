@@ -1,0 +1,6 @@
+#!/bin/bash
+#export VGL_GLLIB=/usr/lib/nvidia-bumblebee/libGL.so.1
+#/usr/bin/optirun -l /usr/lib/nvidia-bumblebee/ "$@"
+export VGL_GLLIB=/opt/nvidia/lib/libGL.so.1
+export LD_LIBRARY_PATH=/opt/nvidia/lib/:/opt/nvidia/lib/32
+/usr/bin/optirun -l /opt/nvidia/lib/ "$@"

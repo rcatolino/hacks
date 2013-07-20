@@ -1,0 +1,7 @@
+#!/bin/bash
+echo "Configuring trackpoint..."
+tee /sys/devices/platform/i8042/serio1/serio2/speed <<<220
+tee /sys/devices/platform/i8042/serio1/serio2/inertia <<<6
+tee /sys/devices/platform/i8042/serio1/serio2/sensitivity <<<250
+tee /sys/devices/platform/i8042/serio1/serio2/press_to_select <<<0
+echo "Done"

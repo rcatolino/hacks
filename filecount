@@ -1,0 +1,41 @@
+#!/usr/bin/clisp -C
+
+(defun print-invalid-path (path)
+  (print (namestring path))
+  nil)
+
+(defun check-count (path max-files)
+  "Check that there are less than 'max-files' under 'path'"
+  (if (< (length (nconc (get-subdirs path) (get-subfiles path))) max-files)
+      T
+      (print-invalid-path path)))
+
+(defun get-subfiles (path)
+  "Returns a list of all the files (not directories) under 'path'"
+  (directory (concatenate 'string (namestring path) "*")))
+
+(defun get-subdirs (path)
+  "Returns a list of all the subdirectories path under 'path'"
+  (directory (concatenate 'string (namestring path) "*/")))
+
+(defun get-children (path)
+  (get-subdirs path))
+
+(defun check-children (path max-files)
+  "Recursively apply filecount-check to all the sub-directories in this directory
+  Stops when one filecount-check returns false, and set false as a result,
+  or stops when all the sub-directories have been checked, and returns true"
+  (do ((dirs (get-children path) (rest dirs)))
+      ((endp dirs) T)
+      (if (not (filecount-check (first dirs) max-files)) (return nil))))
+
+(defun filecount-check (path max-files)
+  "Recursively check that all the directories under 'path' have less than max-files"
+  (if (and (check-count path max-files) (check-children path max-files))
+      T
+      nil))
+
+(cond ((eq 2 (length *ARGS*)) (print (filecount-check (first *ARGS*)
+                                                      (parse-integer (first (rest *ARGS*))))))
+      ((> 2 (length *ARGS*)) (print "Not enough arguments, usage 'filecount path max-files'"))
+      ((< 2 (length *ARGS*)) (print "Too much aguments, usage 'filecount path max-files'")))

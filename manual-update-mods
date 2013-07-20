@@ -1,0 +1,16 @@
+#!/bin/bash
+# Update the bbswitch module
+BBSW_PATH=$HOME/workspace/bbswitch
+cd $BBSW_PATH
+make clean
+make
+sudo make install
+sudo modprobe -a bbswitch
+
+# Update the nvidia kernel module
+NV_PATH=$HOME/usr/nvidia/kernel
+cd $NV_PATH
+make clean
+make module
+sudo cp nvidia.ko /usr/lib/modules/$(uname -r)/kernel/drivers/video/
+sudo depmod -a

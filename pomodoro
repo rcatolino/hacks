@@ -1,0 +1,66 @@
+#!/bin/bash
+# If the application is started, terminate it, otherwise, start it.
+
+tmpfile=/tmp/pomodoro.lock
+statefile=/tmp/pomodoro.state
+
+work() {
+  for i in $(seq 1 25)
+  do
+    echo "Work : $(( 26-i ))" > $statefile
+    echo "#1155FF" >> $statefile
+    sleep 1m
+  done
+}
+short_break() {
+  for i in $(seq 1 7)
+  do
+    echo "Break : $(( 8-i ))" > $statefile
+    echo "#00FF00" >> $statefile
+    sleep 1m
+  done
+}
+long_break() {
+  for i in $(seq 1 20)
+  do
+    echo "Break : $(( 21-i ))" > $statefile
+    echo "#00FF00" >> $statefile
+    sleep 1m
+  done
+}
+
+if [ -f $tmpfile ]
+then
+  read pid < $tmpfile
+  notify-send "Pomodoro" "stopping pomodoros"
+  rm -f $tmpfile
+  rm -f $statefile
+  kill $pid
+  exit 0
+fi
+
+# Start the application
+(
+pid=$(ps -C pomodoro -o pid=)
+echo $pid > $tmpfile
+
+while true
+do
+  for j in $(seq 1 4)
+  do
+    notify-send "Pomodoro" "Starting next pomodoro"
+    mplayer /home/raph/workspace/mozilla-forms-pref/gaia/apps/dialer/style/ringtones/classic.wav >& /dev/null
+    work
+    notify-send "Pomodoro" "7min break!"
+    mplayer /home/raph/workspace/mozilla-forms-pref/gaia/apps/dialer/style/ringtones/classic.wav >& /dev/null
+    short_break
+  done
+
+  notify-send "Pomodoro" "Starting next pomodoro"
+  mplayer /home/raph/workspace/mozilla-forms-pref/gaia/apps/dialer/style/ringtones/classic.wav >& /dev/null
+  work
+  notify-send "Pomodoro" "Take a 20 min break! \\o/"
+  mplayer /home/raph/workspace/mozilla-forms-pref/gaia/apps/dialer/style/ringtones/classic.wav >& /dev/null
+  long_break
+done
+)&

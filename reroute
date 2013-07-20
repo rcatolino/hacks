@@ -1,0 +1,4 @@
+#!/bin/bash
+route del default
+route del 134.214.220.1
+route add default gw 134.214.220.1 wlan0

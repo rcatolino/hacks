@@ -1,0 +1,41 @@
+#!/bin/bash
+hg st -v | grep "M " > files.tmp
+hg qst -v | grep "M " > patchfiles.tmp
+while read line
+do
+  while read comp
+  do
+    if [ "$line" == "$comp" ]
+    then
+      echo "Changes on files shared between patches cannot be unshifted that easily"
+      echo "Changes on file $line cannot be unshifted"
+      exit 1
+    fi
+  done < patchfiles.tmp
+done < files.tmp
+
+base="`hg showconfig | grep mainrepo | egrep -o '/.*'`" || exit 2
+while read line
+do
+  line=${line:2}
+  line=$base/$line
+  echo $line
+  cp $line{,.bak}
+done < files.tmp
+
+hg revert --all
+hg qpop
+
+while read line
+do
+  line=${line:2}
+  line=$base/$line
+  cp $line{,.orig}
+  mv $line{.bak,}
+done < files.tmp
+
+hg qref
+hg qpush
+
+#rm files.tmp
+#rm patchfiles.tmp

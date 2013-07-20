@@ -1,0 +1,46 @@
+#!/bin/bash
+STATE=0
+ping -c 2 -w 4 8.8.8.8 || STATE=1
+if (($STATE == 1))
+then
+  echo "down" > /tmp/internet-status
+else
+  echo "up" > /tmp/internet-status
+fi
+
+(
+exec 2>/dev/null
+exec 1>/dev/null
+while true
+do
+  ping -c 2 -w 2 8.8.8.8
+  RET=$?
+  VALUE=$RET
+  if (($RET > 1))
+    then
+      RET=1
+  fi
+# echo $STATE;
+# echo $RET;
+
+  if (($STATE != $RET))
+  then
+    ping -c 2 -w 4 8.8.8.8
+    RET=$?
+    if (($RET > 1))
+      then
+        RET=1
+    fi
+    STATE=$RET
+    if (($STATE == 1))
+    then
+      notify-send "Internet monitor" "<p>Internet is down :( ping returned: $VALUE</p>";
+      echo "down" > /tmp/internet-status
+    else
+      notify-send "Internet monitor" "<p>Internet is up &#92;o/ ping returned: $VALUE</p>";
+      echo "up" > /tmp/internet-status
+    fi
+  fi
+  sleep 4
+done
+)&

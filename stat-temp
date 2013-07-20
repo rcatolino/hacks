@@ -1,0 +1,14 @@
+#!/bin/bash
+logfile="./temp-log.m"
+trap "echo ] >> $logfile; exit 0" SIGINT SIGTERM
+echo "T=[" > $logfile
+while true
+do
+  temps=($(sensors | egrep -o ":[ ]*\+[0-9]{2}" | egrep -o "[0-9]{2}"))
+  for i in $(seq 0 5)
+  do
+    echo -n "${temps[$i]} " >> $logfile
+  done
+  echo ";" >> $logfile
+  sleep 10
+done

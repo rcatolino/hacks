@@ -1,0 +1,5 @@
+#!/bin/bash
+systemctl stop bumblebeed.service
+tee /proc/acpi/bbswitch <<< ON
+modprobe nvidia
+export LD_LIBRARY_PATH=/opt/nvidia/lib:/opt/nvidia/lib/tls/

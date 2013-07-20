@@ -1,0 +1,6 @@
+#!/bin/bash
+sleep 1
+notify-send "Starting..." -t 2000 & # We can only remove the property when it's present
+sleep 1 # It takes a few ms to open the bubble
+#xprop -name "plasma-windowed" -set "_NET_WM_WINDOW_TYPE" "_NET_WM_WINDOW_TYPE_FLOATING"
+xprop -name "plasma-desktop" -remove "_NET_WM_WINDOW_TYPE"

@@ -1,0 +1,2 @@
+#!/bin/bash
+rsync -avz --exclude '.directory' ~/music/ vps:/home/raph/music

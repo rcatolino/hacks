@@ -1,0 +1,7 @@
+#!/bin/bash
+touch make.log
+(make $@ 3>&1 1>&2 2>&3; echo $?) | tee make.log
+RET=`tail -n 1 make.log`
+build-notify $RET
+rm make.log
+
