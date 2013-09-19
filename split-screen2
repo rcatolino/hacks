@@ -1,0 +1,44 @@
+#!/bin/bash
+
+trap "echo ; killall screenclone" SIGINT SIGTERM
+
+function create_mode() {
+  MODELINE=$(cvt $1 $2 | grep Modeline | egrep -o "[^\"]*$")
+  echo creating new mode for $1 $2 : $MODELINE
+  xrandr --newmode ${1}x${2} $MODELINE
+}
+
+HRes=$1
+VRes=$2
+MODE_ARG=
+
+if [ "$HRes" -a "$VRes" ]
+then
+  RES_NAME=${HRes}x${VRes}
+  MODE_ARG="--mode $RES_NAME"
+  echo Split screen to $RES_NAME
+  if xrandr --addmode VIRTUAL1 $RES_NAME
+  then
+    echo "Mode already existing"
+  else
+    create_mode $HRes $VRes
+    xrandr --addmode VIRTUAL1 $RES_NAME
+  fi
+else
+  echo "No resolution specified, using auto mode"
+  MODE_ARG=--auto
+fi
+
+echo -n "Activating scondary output..."
+xrandr --output LVDS1 --primary
+xrandr --output LVDS1 --auto --output VIRTUAL1 $MODE_ARG --left-of LVDS1
+
+echo "Done."
+echo "Starting sceenclone."
+optirun screenclone -s $DISPLAY -d :8 -x 1
+echo "Done."
+
+echo -n "Deactivating secondary output..."
+# after screenclone is dead
+xrandr --output VIRTUAL1 --off
+echo "Done"

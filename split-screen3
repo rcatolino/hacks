@@ -1,27 +1,2 @@
 #!/bin/bash
-
-XORG_CONF="xorg.conf.nvidia"
-B_CONF="bumblebee.conf"
-BPATH="/etc/bumblebee"
-
-trap "echo ; killall screenclone" SIGINT SIGTERM
-
-function create_mode() {
-  xrandr --newmode "1680x1050" 146.25  1680 1784 1960 2240  1050 1053 1059 1089 -hsync +vsync
-  xrandr --addmode VIRTUAL1 1680x1050
-}
-
-echo -n "Activating scondary output..."
-xrandr -q | grep 1680x1050 || create_mode
-xrandr --output LVDS1 --primary
-xrandr --output LVDS1 --auto --output VIRTUAL1 --mode 1680x1050 --left-of LVDS1
-#xrandr --output VIRTUAL1 --auto --left-of LVDS1
-echo "Done."
-echo "Starting sceenclone."
-optirun screenclone -s $DISPLAY -d :8 -x 1
-echo "Done."
-
-echo -n "Deactivating secondary output..."
-# after screenclone is dead
-xrandr --output VIRTUAL1 --off
-echo "Done"
+split-screen2 1680 1050
