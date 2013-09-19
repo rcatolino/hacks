@@ -8,7 +8,8 @@ sudo make install
 sudo modprobe -a bbswitch
 
 # Update the nvidia kernel module
-NV_PATH=$HOME/usr/nvidia/kernel
+#NV_PATH=$HOME/usr/nvidia/kernel
+NV_PATH=$HOME/usr/nvidia-319.32/kernel
 cd $NV_PATH
 make clean
 make module
