@@ -3,7 +3,43 @@ import json
 import os
 import select
 import socket
+import subprocess
 import sys
+
+def get_essid(interface):
+  output = subprocess.Popen(['iw', 'dev', interface, 'link'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT).stdout.readlines()
+  if output[0].decode().split(maxsplit=1)[0] == 'Connected':
+    return output[1].decode().split(': ', 1)[1].rstrip('\n')
+  return None
+
+def get_network():
+  net = []
+  output = subprocess.Popen(['ifconfig'], stdout=subprocess.PIPE).stdout.readlines().__iter__()
+  for line in output:
+    try:
+      [interface, _] = line.decode().split(':', 1)
+    except ValueError:
+      return
+
+    address = None
+    address6 = None
+    loop = False
+    essid = None
+    for detail in output:
+      if detail == b'\n':
+        break
+
+      [_, tag, value, _] = str(detail).split(maxsplit=3)
+      if tag == 'inet':
+        address = value
+      elif tag == 'loop':
+        loop = True
+
+    if loop or address is None:
+      continue
+
+    net.append((interface, address, get_essid(interface)))
+  return net
 
 def get_bbswitch():
   state = None
@@ -26,6 +62,17 @@ def add_plugins(status):
   bbswitch_st = get_bbswitch()
   if bbswitch_st != None:
     plugins.append(bbswitch_st)
+
+  for (i, net) in enumerate(get_network()):
+    if net[2] is None:
+      name = 'wired' + str(i)
+      essid = ''
+    else:
+      name = 'wireless' + str(i)
+      essid = ', ' + net[2]
+
+    plugins.append(dict(name = name, color = '#00FF00', full_text = net[0] + ' : ' + net[1] + essid))
+
   return plugins + status
 
 def loop():
