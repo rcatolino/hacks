@@ -2,10 +2,12 @@
 # Update the bbswitch module
 BBSW_PATH=$HOME/workspace/bbswitch
 cd $BBSW_PATH
+git pull
 make clean
-make
-sudo make install
-sudo modprobe -a bbswitch
+make && \
+sudo make install && \
+sudo modprobe -a bbswitch && \
+echo "$(tput bold)Rebuild of bbswitch successful.$(tput sgr0)"
 
 # Update the nvidia kernel module
 #NV_PATH=$HOME/usr/nvidia/kernel
@@ -13,6 +15,11 @@ lversion=$(cat $HOME/usr/nvidia-version)
 NV_PATH=$HOME/usr/nvidia-$lversion/kernel
 cd $NV_PATH
 make clean
-make module
-sudo cp nvidia.ko /usr/lib/modules/$(uname -r)/kernel/drivers/video/
-sudo depmod -a
+make module && \
+if [ ! -e /usr/lib/modules/$(uname -r)/kernel/drivers/video ]
+then
+  sudo mkdir -p /usr/lib/modules/$(uname -r)/kernel/drivers/video
+fi
+sudo cp nvidia.ko /usr/lib/modules/$(uname -r)/kernel/drivers/video/ && \
+sudo depmod -a && \
+echo "$(tput bold)Rebuild of nvidia successful.$(tput sgr0) Ever heard of dkms?"
